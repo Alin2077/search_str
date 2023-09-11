@@ -9,8 +9,16 @@ fn main() {
     // println!("{:#?}",path_list);
     for path in path_list {
         let line_list = find_str(&String::from("智慧"), &path);
-        print!("{:#?}\t",path);
-        println!("{:#?}",line_list);
+        match line_list {
+            Some(line_list) =>{
+                print!("{:#?}\t",path);
+                for line in line_list {
+                    print!("{}-",line);
+                }
+                println!();
+            },
+            None => (),
+        }
     }
 
 }
@@ -48,16 +56,10 @@ fn find_str(find_str: &str, path: &PathBuf) -> Option<Vec<u32>> {
 
     let read_result = match fs::read_to_string(path) {
         Ok(read_result) => read_result,
-        Err(e) => {
-            if e.is_invalid_utf8()  {
-                   return None;
-            } else {
-                panic!("Unexpected error: {}", e);
-            }
-        },
+        Err(_) => return None,
     };
 
-    for (index,value) in read_result.split(find_str).enumerate() {
+    for (index,value) in read_result.lines().enumerate() {
         if value.contains(find_str) {
             result_vec.push(index as u32);
         }
